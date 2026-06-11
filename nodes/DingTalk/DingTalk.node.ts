@@ -1,10 +1,10 @@
 import { IExecuteFunctions } from 'n8n-core';
 import {
 	INodeExecutionData,
+	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
 	NodeOperationError,
-	INodePropertyOptions,
 } from 'n8n-workflow';
 import crypto from 'crypto';
 import axios from 'axios';
@@ -12,6 +12,27 @@ import axios from 'axios';
 import RobotClient, * as $RobotClient from '@alicloud/dingtalk/dist/robot_1_0/client';
 import * as OpenApi from '@alicloud/openapi-client';
 import * as Util from '@alicloud/tea-util';
+
+interface CustomRobotAt {
+	isAtAll: boolean;
+	atMobiles?: string[];
+	atUserIds?: string[];
+}
+
+interface CustomRobotTextMessage {
+	msgtype: string;
+	at?: CustomRobotAt;
+	text?: {
+		content: string;
+	};
+	markdown?: {
+		title: string;
+		text: string;
+	};
+	link?: unknown;
+	actionCard?: unknown;
+	feedCard?: unknown;
+}
 
 export class DingTalk implements INodeType {
 	description: INodeTypeDescription = {
@@ -197,21 +218,23 @@ export class DingTalk implements INodeType {
 				try {
 					item = items[itemIndex];
 					const msgtype = this.getNodeParameter('msgtype', itemIndex) as string;
-					const content = this.getNodeParameter('content', itemIndex) as any;
+					const content = this.getNodeParameter('content', itemIndex) as string;
 
-					const data = { msgtype } as any;
+					const data: CustomRobotTextMessage = { msgtype };
 
 					if ('text' === msgtype || 'markdown' === msgtype) {
 						const atMobiles = this.getNodeParameter('atMobiles', itemIndex) as string[];
 						const atUserIds = this.getNodeParameter('atUserIds', itemIndex) as string[];
-						const isAtAll = this.getNodeParameter('isAtAll', itemIndex);
+						const isAtAll = this.getNodeParameter('isAtAll', itemIndex) as boolean;
+						const at: CustomRobotAt = { isAtAll };
 						data.at = { isAtAll };
 						if (atMobiles && atMobiles.length > 0) {
-							data.at.atMobiles = atMobiles;
+							at.atMobiles = atMobiles;
 						}
 						if (atUserIds && atUserIds.length > 0) {
-							data.at.atUserIds = atUserIds;
+							at.atUserIds = atUserIds;
 						}
+						data.at = at;
 
 						if ('text' === msgtype) {
 							data.text = { content };

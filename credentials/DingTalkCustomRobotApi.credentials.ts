@@ -10,7 +10,7 @@ export class DingTalkCustomRobotApi implements ICredentialType {
 			name: 'webhookUrl',
 			type: 'string',
 			default: '',
-			required: true
+			required: true,
 		},
 		{
 			displayName: 'WebhookSign',

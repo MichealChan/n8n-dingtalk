@@ -10,14 +10,14 @@ export class DingTalkCompanyApi implements ICredentialType {
 			name: 'robotCode',
 			type: 'string',
 			default: '',
-			required: true
+			required: true,
 		},
 		{
 			displayName: 'Access Key Id',
 			name: 'accessKeyId',
 			type: 'string',
 			default: '',
-			required: true
+			required: true,
 		},
 		{
 			displayName: 'Access Key Secret',
@@ -27,21 +27,21 @@ export class DingTalkCompanyApi implements ICredentialType {
 				password: true,
 			},
 			default: '',
-			required: true
+			required: true,
 		},
 		{
 			displayName: 'protocol',
 			name: 'protocol',
 			type: 'string',
 			default: '',
-			required: true
+			required: true,
 		},
 		{
 			displayName: 'region id',
 			name: 'regionId',
 			type: 'string',
 			default: '',
-			required: true
-		}
+			required: true,
+		},
 	];
 }

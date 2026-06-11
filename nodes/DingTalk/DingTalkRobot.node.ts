@@ -19,6 +19,51 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
+interface RobotAt {
+	isAtAll: boolean;
+	atMobiles?: string[];
+	atUserIds?: string[];
+}
+
+interface RobotMessage {
+	msgtype: string | null;
+	at?: RobotAt;
+	text?: {
+		content: string;
+	};
+	markdown?: {
+		title: string;
+		text: string;
+	};
+	link?: {
+		text: string;
+		title: string;
+		picUrl: string;
+		messageUrl: string;
+	};
+	actionCard?: {
+		title: string;
+		text: string;
+		btnOrientation?: string;
+		singleTitle?: string;
+		singleURL?: string;
+		btns?: Array<{ title: string; actionURL: string }>;
+	};
+	feedCard?: {
+		links: Array<{ title: string; messageURL: string; picURL: string }>;
+	};
+	[key: string]: unknown;
+}
+
+interface RobotActionCard {
+	title: string;
+	text: string;
+	btnOrientation?: string;
+	singleTitle?: string;
+	singleURL?: string;
+	btns?: Array<{ title: string; actionURL: string }>;
+}
+
 export function parseMentionList(value?: string): string[] {
 	if (!value) {
 		return [];
@@ -219,7 +264,7 @@ export class DingTalkRobot implements INodeType {
 					{
 						name: 'sampleFile文件类型',
 						value: 'sampleFile',
-					}
+					},
 				],
 				default: 'sampleText',
 				displayOptions: {
@@ -948,7 +993,7 @@ export class DingTalkRobot implements INodeType {
 						type: ['companyInternalRobot'],
 						enableJsonMode: [false],
 						msgKey: ['sampleFile'],
-					}
+					},
 				},
 				hint: '要在钉钉消息中显示的文件名称。不填写则自动使用上一节点的文件名称。',
 			},
@@ -963,7 +1008,7 @@ export class DingTalkRobot implements INodeType {
 						type: ['companyInternalRobot'],
 						enableJsonMode: [false],
 						msgKey: ['sampleFile'],
-					}
+					},
 				},
 				hint: '文件类型，支持xlsx、pdf、zip、rar、doc、docx格式。不填写则自动使用上一节点的文件类型。',
 			},
@@ -978,7 +1023,7 @@ export class DingTalkRobot implements INodeType {
 						type: ['companyInternalRobot'],
 						enableJsonMode: [false],
 						msgKey: ['sampleFile'],
-					}
+					},
 				},
 				hint: 'The name of the input binary field containing the file to be uploaded',
 			},
@@ -1010,26 +1055,27 @@ export class DingTalkRobot implements INodeType {
 					const msgtype = enableJsonMode
 						? null
 						: (this.getNodeParameter('msgtype', itemIndex) as string);
-					const data = { msgtype } as any;
+					const data = { msgtype } as Record<string, unknown>;
 
 					if (enableJsonMode) {
 						const json = this.getNodeParameter('json', itemIndex) as object;
 						Object.assign(data, json);
 					} else if ('text' === msgtype || 'markdown' === msgtype) {
-						const isAtAll = this.getNodeParameter('isAtAll', itemIndex);
+						const isAtAll = this.getNodeParameter('isAtAll', itemIndex) as boolean;
 						const atMobiles = isAtAll
 							? []
 							: parseMentionList(this.getNodeParameter('atMobiles', itemIndex) as string);
 						const atUserIds = isAtAll
 							? []
 							: parseMentionList(this.getNodeParameter('atUserIds', itemIndex) as string);
-						data.at = { isAtAll };
-						if (atMobiles.length > 0) {
-							data.at.atMobiles = atMobiles;
-						}
-						if (atUserIds.length > 0) {
-							data.at.atUserIds = atUserIds;
-						}
+							const at: RobotAt = { isAtAll };
+							if (atMobiles.length > 0) {
+								at.atMobiles = atMobiles;
+							}
+							if (atUserIds.length > 0) {
+								at.atUserIds = atUserIds;
+							}
+							data.at = at;
 
 						if ('text' === msgtype) {
 							const content = this.getNodeParameter('content', itemIndex) as string;
@@ -1050,29 +1096,30 @@ export class DingTalkRobot implements INodeType {
 							picUrl: this.getNodeParameter('picUrl', itemIndex) || '',
 							messageUrl: this.getNodeParameter('url', itemIndex),
 						};
-					} else if ('actionCard' === msgtype) {
-						data.actionCard = {
-							title: this.getNodeParameter('title', itemIndex),
-							text: this.getNodeParameter('markdownText', itemIndex),
-						};
-						const btnOrientation = this.getNodeParameter('btnOrientation', itemIndex);
-						if (btnOrientation) {
-							data.actionCard.btnOrientation = btnOrientation;
+						} else if ('actionCard' === msgtype) {
+							const actionCard: RobotActionCard = {
+								title: String(this.getNodeParameter('title', itemIndex)),
+								text: String(this.getNodeParameter('markdownText', itemIndex)),
+							};
+							const btnOrientation = this.getNodeParameter('btnOrientation', itemIndex);
+							if (btnOrientation) {
+								actionCard.btnOrientation = btnOrientation as string;
+							}
+							const isSingleButton = this.getNodeParameter('isSingleButton', itemIndex) as boolean;
+							if (isSingleButton) {
+								actionCard.singleTitle = String(this.getNodeParameter('singleTitle', itemIndex));
+								actionCard.singleURL = String(this.getNodeParameter('singleURL', itemIndex));
+							} else {
+								const btns = this.getNodeParameter('btns', itemIndex) as INodeParameters;
+								actionCard.btns = btns.buttons as Array<{ title: string; actionURL: string }>;
+							}
+							data.actionCard = actionCard;
+						} else if ('feedCard' === msgtype) {
+							const lks = this.getNodeParameter('lks', itemIndex) as INodeParameters;
+							data.feedCard = {
+								links: lks.links as Array<{ title: string; messageURL: string; picURL: string }>,
+							};
 						}
-						const isSingleButton = this.getNodeParameter('isSingleButton', itemIndex) as boolean;
-						if (isSingleButton) {
-							data.actionCard.singleTitle = this.getNodeParameter('singleTitle', itemIndex);
-							data.actionCard.singleURL = this.getNodeParameter('singleURL', itemIndex);
-						} else {
-							const btns = this.getNodeParameter('btns', itemIndex) as INodeParameters;
-							data.actionCard.btns = btns.buttons;
-						}
-					} else if ('feedCard' === msgtype) {
-						const lks = this.getNodeParameter('lks', itemIndex) as INodeParameters;
-						data.feedCard = {
-							links: lks.links,
-						};
-					}
 					console.log(data);
 					const res = await axios.post(url, data, {
 						headers: {
@@ -1127,7 +1174,10 @@ export class DingTalkRobot implements INodeType {
 					const msgKey = enableJsonMode
 						? null
 						: (this.getNodeParameter('msgKey', itemIndex) as string);
-					const data = {} as any;
+					const msgtype = enableJsonMode
+						? null
+						: (this.getNodeParameter('msgKey', itemIndex) as string);
+					const data: RobotMessage = { msgtype };
 					batchSendOTOHeaders.xAcsDingtalkAccessToken = token;
 					if (enableJsonMode) {
 						const json = JSON.parse(this.getNodeParameter('json', itemIndex) as string);
@@ -1140,15 +1190,15 @@ export class DingTalkRobot implements INodeType {
 						);
 					} else {
 						const nodeParameters = JSON.parse(JSON.stringify(this.getNode().parameters));
-						const userIds: { users: [] } = nodeParameters?.userIds;
+						const userIds: { users: Array<{ mobile: string }> } = nodeParameters?.userIds;
 						const userIdList: string[] = [];
-						let failUser = [];
+						const failUser = [];
 						for (let i = 0; i < userIds.users.length; i++) {
-							const user: { mobile: any } = userIds.users[i];
+							const user = userIds.users[i];
 							const mobile = user.mobile;
 							const res = await axios.post(
 								getUserIdByMobileUrl,
-								{ mobile: mobile },
+								{ mobile },
 								{
 									headers: {
 										'Content-Type': 'application/json',
@@ -1162,7 +1212,7 @@ export class DingTalkRobot implements INodeType {
 							}
 						}
 						if (failUser && failUser.length > 0) {
-							result.push({ json: { failUser: failUser } });
+							result.push({ json: { failUser } });
 						}
 						if (!userIdList || userIdList.length === 0) {
 							return this.prepareOutputData(result);
@@ -1172,7 +1222,7 @@ export class DingTalkRobot implements INodeType {
 						delete nodeParameters.enableJsonMode;
 						delete nodeParameters.userIds;
 						delete nodeParameters.msgKey;
-						let sendMsgParams = {} as Record<string, any>;
+						const sendMsgParams: Record<string, unknown> = {};
 						// tslint:disable-next-line:forin
 						for (const nodeParametersKey in nodeParameters) {
 							// @ts-ignore
@@ -1181,16 +1231,16 @@ export class DingTalkRobot implements INodeType {
 								itemIndex,
 							);
 						}
-						if (msgKey == 'sampleFile') {
-							const binaryPropertyName = sendMsgParams.binaryPropertyName;
+						if (msgKey === 'sampleFile') {
+							const binaryPropertyName = sendMsgParams.binaryPropertyName as string;
 							// @ts-ignorex
 							const binaryData = this.helpers.assertBinaryData(itemIndex, binaryPropertyName) as IBinaryData;
 							// 处理默认字段
 							if (!sendMsgParams.fileName) {
-								sendMsgParams.fileName = binaryData.fileName
+								sendMsgParams.fileName = binaryData.fileName;
 							}
 							if (!sendMsgParams.fileType) {
-								sendMsgParams.fileType = binaryData.fileExtension
+								sendMsgParams.fileType = binaryData.fileExtension;
 							}
 							const uploadMediaUrl = 'https://oapi.dingtalk.com/media/upload?access_token=' + token;
 
@@ -1207,14 +1257,14 @@ export class DingTalkRobot implements INodeType {
 							formData.append('type', 'file');
 								const response = await axios.post(uploadMediaUrl, formData, {
 								headers: {
-									...formData.getHeaders()
+									...formData.getHeaders(),
 								},
 							});
 							sendMsgParams.mediaId = response.data.media_id;
 						}
-						let sendParams = {
-							robotCode: robotCode,
-							msgKey: msgKey,
+						const sendParams = {
+							robotCode,
+							msgKey,
 							userIds: userIdList,
 							msgParam: JSON.stringify(sendMsgParams).replace(/\\\\/g, '\\'),
 						};
@@ -1244,7 +1294,7 @@ export class DingTalkRobot implements INodeType {
 						});
 					}
 				}
-				return this.prepareOutputData(result as any);
+						return this.prepareOutputData(result as INodeExecutionData[]);
 			}
 
 			return this.prepareOutputData([]);
