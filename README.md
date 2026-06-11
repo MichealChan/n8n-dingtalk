@@ -1,6 +1,6 @@
-# n8n-dingtalk
+# n8n-nodes-dingtalk-new
 
-[![NPM badge](https://img.shields.io/npm/v/n8n-dingtalk.svg)](https://www.npmjs.com/package/n8n-dingtalk)
+[![NPM badge](https://img.shields.io/npm/v/n8n-nodes-dingtalk-new.svg)](https://www.npmjs.com/package/n8n-nodes-dingtalk-new)
 
 For [钉钉](https://dingtalk.com)
 
@@ -45,8 +45,8 @@ For [钉钉](https://dingtalk.com)
 
 ```shell
 $ cd ~/git
-$ git clone https://github.com/ruanjf/n8n-nodes-dingtalk.git
-$ cd n8n-nodes-dingtalk
+$ git clone https://github.com/MichealChan/n8n-dingtalk.git
+$ cd n8n-dingtalk
 $ npm run dev
 ```
 
@@ -54,7 +54,7 @@ $ npm run dev
 
 ```shell
 $ cd ~/.n8n/nodes/
-$ npm install ../../git/n8n-nodes-dingtalk
+$ npm install n8n-nodes-dingtalk-new
 ```
 
 4. 重启`n8n`
@@ -62,8 +62,8 @@ $ npm install ../../git/n8n-nodes-dingtalk
 ## 示例workflow
 
 导入demo
-[test/dingding-workflow-robot.json](https://github.com/ruanjf/n8n-nodes-dingtalk/raw/main/test/dingding-workflow-robot.json)
+[test/dingding-workflow-robot.json](https://github.com/MichealChan/n8n-dingtalk/raw/main/test/dingding-workflow-robot.json)
 
 ## License
 
-[MIT](https://github.com/ruanjf/n8n-nodes-dingtalk/blob/main/LICENSE.md)
+[MIT](https://github.com/MichealChan/n8n-dingtalk/blob/main/LICENSE.md)
