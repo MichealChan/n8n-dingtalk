@@ -1,6 +1,6 @@
-# n8n-nodes-dingtalk
+# n8n-dingtalk
 
-[![NPM badge](https://img.shields.io/npm/v/n8n-nodes-dingtalk.svg)](https://www.npmjs.com/package/n8n-nodes-dingtalk)
+[![NPM badge](https://img.shields.io/npm/v/n8n-dingtalk.svg)](https://www.npmjs.com/package/n8n-dingtalk)
 
 For [钉钉](https://dingtalk.com)
 
