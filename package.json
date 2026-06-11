@@ -1,6 +1,6 @@
 {
   "name": "n8n-dingtalk",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "",
   "keywords": [
     "n8n-community-node-package",
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ruanjf/n8n-nodes-dingtalk.git"
+    "url": "git+https://github.com/ruanjf/n8n-nodes-dingtalk.git"
   },
   "main": "index.js",
   "scripts": {
