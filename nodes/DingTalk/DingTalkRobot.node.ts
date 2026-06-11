@@ -94,7 +94,7 @@ export function appendMentions(content: string, atMobiles: string[], atUserIds: 
 export class DingTalkRobot implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: '钉钉机器人',
-		name: 'dingTalkRobot',
+		name: 'dingTalkRobotNew',
 		icon: 'file:dingtalk.svg',
 		group: ['input'],
 		version: 1,
@@ -105,19 +105,19 @@ export class DingTalkRobot implements INodeType {
 		},
 		inputs: ['main'],
 		outputs: ['main'],
-		credentials: [
-			{
-				name: 'dingTalkCustomRobotApi',
-				required: true,
+			credentials: [
+				{
+					name: 'dingTalkCustomRobotApiNew',
+					required: true,
 				displayOptions: {
 					show: {
 						type: ['customRobot'],
 					},
 				},
 			},
-			{
-				name: 'dingTalkCompanyApi',
-				required: true,
+				{
+					name: 'dingTalkCompanyApiNew',
+					required: true,
 				displayOptions: {
 					show: {
 						type: ['companyInternalRobot'],

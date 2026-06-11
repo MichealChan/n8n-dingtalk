@@ -37,7 +37,7 @@ interface CustomRobotTextMessage {
 export class DingTalk implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'DingDing',
-		name: 'DingTalk',
+		name: 'DingTalkNew',
 		icon: 'file:dingtalk.svg',
 		group: ['input'],
 		version: 1,
@@ -48,19 +48,19 @@ export class DingTalk implements INodeType {
 		},
 		inputs: ['main'],
 		outputs: ['main'],
-		credentials: [
-			{
-				name: 'dingtalkApi',
-				required: true,
+			credentials: [
+				{
+					name: 'dingtalkApiNew',
+					required: true,
 				displayOptions: {
 					show: {
 						type: ['dingtalk'],
 					},
 				},
 			},
-			{
-				name: 'dingTalkCustomRobotApi',
-				required: true,
+				{
+					name: 'dingTalkCustomRobotApiNew',
+					required: true,
 				displayOptions: {
 					show: {
 						type: ['customRobot'],
