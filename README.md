@@ -25,6 +25,8 @@ For [钉钉](https://dingtalk.com)
 3. markdown类型
 <img width="380" alt="image" src="https://user-images.githubusercontent.com/509251/193441552-f47d40cd-061f-4bf8-b2c9-78f662809243.png">
 
+> 自定义机器人在 `text` / `markdown` 场景下，填写“被@人的手机号”或“被@人的用户Userid”后，插件会自动把对应的 `@手机号` / `@userid` 追加到消息正文中，确保钉钉实际触发 @ 效果。
+
 4. 整体跳转ActionCard类型
 <img width="360" alt="image" src="https://user-images.githubusercontent.com/509251/193441654-c36e5a81-0321-4043-9688-b648a04521bf.png">
 

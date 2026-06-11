@@ -19,6 +19,33 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
+export function parseMentionList(value?: string): string[] {
+	if (!value) {
+		return [];
+	}
+
+	return value
+		.split(',')
+		.map((item) => item.trim())
+		.filter((item) => item.length > 0);
+}
+
+export function appendMentions(content: string, atMobiles: string[], atUserIds: string[]): string {
+	const mentions = [
+		...atMobiles.map((mobile) => `@${mobile}`),
+		...atUserIds.map((userId) => `@${userId}`),
+	];
+	const uniqueMentions = [...new Set(mentions)];
+	const missingMentions = uniqueMentions.filter((mention) => !content.includes(mention));
+
+	if (missingMentions.length === 0) {
+		return content;
+	}
+
+	const separator = content.endsWith('\n') || content.length === 0 ? '' : '\n';
+	return `${content}${separator}${missingMentions.join(' ')}`;
+}
+
 export class DingTalkRobot implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: '钉钉机器人',
@@ -991,27 +1018,29 @@ export class DingTalkRobot implements INodeType {
 					} else if ('text' === msgtype || 'markdown' === msgtype) {
 						const isAtAll = this.getNodeParameter('isAtAll', itemIndex);
 						const atMobiles = isAtAll
-							? null
-							: (this.getNodeParameter('atMobiles', itemIndex) as string)?.split(',');
+							? []
+							: parseMentionList(this.getNodeParameter('atMobiles', itemIndex) as string);
 						const atUserIds = isAtAll
-							? null
-							: (this.getNodeParameter('atUserIds', itemIndex) as string)?.split(',');
+							? []
+							: parseMentionList(this.getNodeParameter('atUserIds', itemIndex) as string);
 						data.at = { isAtAll };
-						if (atMobiles && atMobiles.length > 0) {
+						if (atMobiles.length > 0) {
 							data.at.atMobiles = atMobiles;
 						}
-						if (atUserIds && atUserIds.length > 0) {
+						if (atUserIds.length > 0) {
 							data.at.atUserIds = atUserIds;
 						}
 
 						if ('text' === msgtype) {
+							const content = this.getNodeParameter('content', itemIndex) as string;
 							data.text = {
-								content: this.getNodeParameter('content', itemIndex),
+								content: appendMentions(content, atMobiles, atUserIds),
 							};
 						} else if ('markdown' === msgtype) {
+							const markdownText = this.getNodeParameter('markdownText', itemIndex) as string;
 							data.markdown = {
 								title: this.getNodeParameter('title', itemIndex),
-								text: this.getNodeParameter('markdownText', itemIndex),
+								text: appendMentions(markdownText, atMobiles, atUserIds),
 							};
 						}
 					} else if ('link' === msgtype) {
