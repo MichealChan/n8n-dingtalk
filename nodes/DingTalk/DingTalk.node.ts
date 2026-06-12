@@ -50,35 +50,17 @@ export class DingTalk implements INodeType {
 		outputs: ['main'],
 		credentials: [
 			{
-				name: 'dingtalkApi',
-				required: true,
-				displayOptions: {
-					show: {
-						type: ['dingtalk'],
-					},
-				},
-			},
-			{
 				name: 'dingtalkApiNew',
-					required: true,
-				displayOptions: {
-					show: {
-						type: ['dingtalk'],
-					},
-				},
-			},
-			{
-				name: 'dingTalkCustomRobotApi',
 				required: true,
 				displayOptions: {
 					show: {
-						type: ['customRobot'],
+						type: ['dingtalk'],
 					},
 				},
 			},
 			{
 				name: 'dingTalkCustomRobotApiNew',
-					required: true,
+				required: true,
 				displayOptions: {
 					show: {
 						type: ['customRobot'],
