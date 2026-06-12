@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-dingtalk-new",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "",
   "keywords": [
     "n8n-community-node-package",
@@ -28,7 +28,8 @@
     "prepublishOnly": "npm run build"
   },
   "files": [
-    "dist"
+    "dist/nodes",
+    "dist/credentials"
   ],
   "publishConfig": {
     "access": "public"
