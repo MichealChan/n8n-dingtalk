@@ -91,6 +91,19 @@ export function appendMentions(content: string, atMobiles: string[], atUserIds: 
 	return `${content}${separator}${missingMentions.join(' ')}`;
 }
 
+async function getCredentialWithFallback(
+	node: IExecuteFunctions,
+	itemIndex: number,
+	preferredName: string,
+	legacyName: string,
+) {
+	try {
+		return await node.getCredentials(preferredName, itemIndex);
+	} catch (error) {
+		return await node.getCredentials(legacyName, itemIndex);
+	}
+}
+
 export class DingTalkRobot implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: '钉钉机器人',
@@ -1052,7 +1065,12 @@ export class DingTalkRobot implements INodeType {
 		const type = this.getNodeParameter('type', 0);
 		const items = this.getInputData();
 		if (type === 'customRobot') {
-			const credentials = await this.getCredentials('dingTalkCustomRobotApi');
+			const credentials = await getCredentialWithFallback(
+				this,
+				0,
+				'dingTalkCustomRobotApiNew',
+				'dingTalkCustomRobotApi',
+			);
 
 			const timestamp = Date.parse(new Date().toString());
 			const stringToSign = `${timestamp}\n${credentials.webhookSign}`;
@@ -1166,7 +1184,12 @@ export class DingTalkRobot implements INodeType {
 
 			return this.prepareOutputData(result);
 		} else if (type === 'companyInternalRobot') {
-			const credentials = await this.getCredentials('dingTalkCompanyApi');
+			const credentials = await getCredentialWithFallback(
+				this,
+				0,
+				'dingTalkCompanyApiNew',
+				'dingTalkCompanyApi',
+			);
 			const config = new $OpenApi.Config({});
 			config.protocol = credentials.protocol as string;
 			config.regionId = credentials.regionId as string;
