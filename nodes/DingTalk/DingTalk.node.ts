@@ -48,9 +48,18 @@ export class DingTalk implements INodeType {
 		},
 		inputs: ['main'],
 		outputs: ['main'],
-			credentials: [
-				{
-					name: 'dingtalkApiNew',
+		credentials: [
+			{
+				name: 'dingtalkApi',
+				required: true,
+				displayOptions: {
+					show: {
+						type: ['dingtalk'],
+					},
+				},
+			},
+			{
+				name: 'dingtalkApiNew',
 					required: true,
 				displayOptions: {
 					show: {
@@ -58,8 +67,17 @@ export class DingTalk implements INodeType {
 					},
 				},
 			},
-				{
-					name: 'dingTalkCustomRobotApiNew',
+			{
+				name: 'dingTalkCustomRobotApi',
+				required: true,
+				displayOptions: {
+					show: {
+						type: ['customRobot'],
+					},
+				},
+			},
+			{
+				name: 'dingTalkCustomRobotApiNew',
 					required: true,
 				displayOptions: {
 					show: {
